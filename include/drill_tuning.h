@@ -3,43 +3,40 @@
 
 void drill_tuning(){
       disp.clear();
-      disp.print(topSpinCounter);
+      disp.print(drillSpinCounter);
       disp.update();
       DBR_EE_write.update();
       DBR_select.update();
       DBR_on_start_pos.update();
       DBR_ff_button.update();
-      DDBR_rew_button.update();
+      DBR_rew_button.update();
       //------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(DRILL_ADDRES,topSpinCounter + correction);
+        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out);
         disp.clear();
         disp.print("gone");
         disp.update();
-        delay(2000);
+        delay(1000);
       }
       //----------------------- возврат на исходную  
-      if (DBR_on_start_pos.fell() && DBR_top_zero_sens.read() == HIGH ){ 
+      if (DBR_on_start_pos.fell() && DBR_drill_zero_sens.read() == HIGH ){ 
             disp.clear();
             disp.print("on O");
             disp.update();
-            topSpinCounter = 0;
-            int i = 0;
-        while (DBR_top_zero_sens.read() == HIGH) {
-          if(i>3000){
-            disp.clear();
-            disp.print("errO");
-            disp.update();
-            delay(100000);
+        for(int i = 0; i < (drillSpinCounter + 100); i++){
+          DBR_drill_zero_sens.update();
+          if(DBR_drill_zero_sens.read() == LOW){
+            drillSpinCounter = 0;
             break;
           }
-          DBR_top_zero_sens.update();
+          if(i/100 == 0)Watchdog.reset();
+
           digitalWrite(DRILL_PULSE_OUT, HIGH);
           delayMks(50);
           digitalWrite(DRILL_PULSE_OUT, LOW);
           delay(1);
         }
-        for(int i = 0; i < correction; i++){
+        for(int i = 0; i < run_out; i++){
           digitalWrite(DRILL_PULSE_OUT, HIGH);
           delayMks(50);
           digitalWrite(DRILL_PULSE_OUT, LOW);
@@ -50,34 +47,35 @@ void drill_tuning(){
       else if (DBR_ff_button.read() == LOW) {
         while (DBR_ff_button.read() == LOW){
           disp.clear();
-          disp.print(topSpinCounter);
+          disp.print(drillSpinCounter);
           disp.update();
           DBR_ff_button.update();
-          DBR_top_zero_sens.update();
+          DBR_drill_zero_sens.update();
           digitalWrite(DRILL_PULSE_OUT, HIGH);
-          delayMks(50);
-          if (DBR_top_zero_sens.read() == HIGH && topSpinCounter > 0)
-            topSpinCounter--;
+          delayMks(10);
           digitalWrite(DRILL_PULSE_OUT, LOW);
           //delay(1);
+          if (DBR_drill_zero_sens.read() == HIGH && drillSpinCounter > 0)drillSpinCounter--;
+          Watchdog.reset();
         }
       }
       //-----------------------------кнопка назад
-      else if (DDBR_rew_button.read() == LOW){
-        while (DDBR_rew_button.read() == LOW){
+      else if (DBR_rew_button.read() == LOW){
+        while (DBR_rew_button.read() == LOW){
           disp.clear();
-          disp.print(topSpinCounter);
+          disp.print(drillSpinCounter);
           disp.update();
-          DDBR_rew_button.update();
-          DBR_top_zero_sens.update();
+          DBR_rew_button.update();
+          DBR_drill_zero_sens.update();
           digitalWrite(DRILL_DIR_OUT, HIGH);
           delayMks(10);
           digitalWrite(DRILL_PULSE_OUT, HIGH);
-          delayMks(50);
-          if (DBR_top_zero_sens.read() == HIGH) topSpinCounter++;
+          delayMks(10);
           digitalWrite(DRILL_PULSE_OUT, LOW);
-          //delay(1);
           digitalWrite(DRILL_DIR_OUT, LOW);
+          //delay(1);
+          if (DBR_drill_zero_sens.read() == HIGH) drillSpinCounter++;
+          Watchdog.reset();
         }
       }
 }

@@ -10,9 +10,9 @@ void readModbusRegisters(){
     modbus.poll();
     delay(10);
      Serial.println("modbus_poll");
-    EEPROM.put(TOP_SPINDEL_SERVO_SPEED_ADDRES,holdingRegisters[0]);
-    EEPROM.put(LOW_SPINDEL_SERVO_SPEED_ADDRES,holdingRegisters[1]);
-    EEPROM.put(TOP_SPINDEL_WORK_ADDRES,holdingRegisters[2]);
-    EEPROM.put(LOW_SPINDEL_WORK_ADDRES,holdingRegisters[3]);
+    EEPROM.put(DRILL_SERVO_SPEED_ADDRES,holdingRegisters[0]);
+    EEPROM.put(SINK_SERVO_SPEED_ADDRES,holdingRegisters[1]);
+    EEPROM.put(DRILL_WORK_ADDRES,holdingRegisters[2]);
+    EEPROM.put(SINK_WORK_ADDRES,holdingRegisters[3]);
     
 }
