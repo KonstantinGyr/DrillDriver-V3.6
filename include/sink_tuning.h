@@ -23,6 +23,7 @@ void sink_tuning(){
             disp.clear();
             disp.print("on O");
             disp.update();
+            Serial.println("drill on O");
         for(int i = 0; i < (sinkSpinCounter + 100); i++){
           DBR_sink_zero_sens.update();
           if(DBR_sink_zero_sens.read() == LOW){
@@ -46,6 +47,7 @@ void sink_tuning(){
       }
       //-------------------------------кнопка вперед
       else if (DBR_ff_button.read() == LOW){ 
+        Serial.println("sink forward");
         while (DBR_ff_button.read() == LOW){
           disp.clear();
           disp.print(sinkSpinCounter);
@@ -61,6 +63,7 @@ void sink_tuning(){
       }
       //---------------------------------кнопка назад
       else if (DBR_rew_button.read() == LOW){ 
+        Serial.println("sink rewers");
         while (DBR_rew_button.read() == LOW){
           disp.clear();
           disp.print(sinkSpinCounter);

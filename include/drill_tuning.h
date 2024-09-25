@@ -23,6 +23,7 @@ void drill_tuning(){
             disp.clear();
             disp.print("on O");
             disp.update();
+            Serial.println("on O");
         for(int i = 0; i < (drillSpinCounter + 100); i++){
           DBR_drill_zero_sens.update();
           if(DBR_drill_zero_sens.read() == LOW){
@@ -45,6 +46,7 @@ void drill_tuning(){
       }
       //------------------------------- кнопка вперед
       else if (DBR_ff_button.read() == LOW) {
+        Serial.println("drill forward");
         while (DBR_ff_button.read() == LOW){
           disp.clear();
           disp.print(drillSpinCounter);
@@ -61,6 +63,7 @@ void drill_tuning(){
       }
       //-----------------------------кнопка назад
       else if (DBR_rew_button.read() == LOW){
+        Serial.println("drill revese");
         while (DBR_rew_button.read() == LOW){
           disp.clear();
           disp.print(drillSpinCounter);
