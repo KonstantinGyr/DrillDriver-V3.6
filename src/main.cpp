@@ -29,7 +29,7 @@ void setup(){
   pinMode(DRILL_DIR_OUT, OUTPUT);
   pinMode(SINK_PULSE_OUT, OUTPUT);
   pinMode(SINK_DIR_OUT, OUTPUT);
-  Serial.println("output init");
+  //Serial.println("output init");
   //-----------------------------антидребезг
   DBR_start.attach(START_PIN);
   DBR_start.interval(3);
@@ -49,7 +49,7 @@ void setup(){
   DBR_rew_button.interval(1);
   DBR_on_start_pos.attach(INIT_POS_BUTTON_PIN);
   DBR_on_start_pos.interval(3);
-  Serial.println("debounser init");
+  //Serial.println("debounser init");
   //---------------------дисплей. печатать справа
   disp.printRight(true);  
   disp.setCursorEnd(); 
@@ -83,6 +83,7 @@ void loop(){
     disp.clear();
     disp.print("-go-");
     disp.update();
+    Serial.println("Poll start");
     //readModbusRegisters();
   //-----------------------------------Один рабочий цикл
     if (DBR_drill_zero_sens.read() == LOW && DBR_sink_zero_sens.read() == LOW && DBR_start.fell()){

@@ -9,7 +9,7 @@ ModbusRTUSlave modbus(Serial,dePin);
 void readModbusRegisters(){
     modbus.poll();
     delay(10);
-     Serial.println("modbus_poll");
+  //   Serial.println("modbus_poll");
     EEPROM.put(DRILL_SERVO_SPEED_ADDRES,holdingRegisters[0]);
     EEPROM.put(SINK_SERVO_SPEED_ADDRES,holdingRegisters[1]);
     EEPROM.put(DRILL_WORK_ADDRES,holdingRegisters[2]);

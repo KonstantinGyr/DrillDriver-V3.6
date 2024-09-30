@@ -23,20 +23,19 @@ void sink_tuning(){
             disp.clear();
             disp.print("on O");
             disp.update();
-            Serial.println("drill on O");
-        for(int i = 0; i < (sinkSpinCounter + 100); i++){
+            Serial.println("sink go to O");
+        for(int i = 0; i < (sinkSpinCounter + 200); i++){
           DBR_sink_zero_sens.update();
           if(DBR_sink_zero_sens.read() == LOW){
             sinkSpinCounter = 0;
+            Serial.println("on O");
             break;
           }
           if(i/100 == 0)Watchdog.reset();
-          DBR_sink_zero_sens.update();
           digitalWrite(SINK_PULSE_OUT, HIGH);
           delayMks(50);
           digitalWrite(SINK_PULSE_OUT, LOW);
           delay(1);
-          i++;
         }
         for(int i = 0; i < run_out; i++){
           digitalWrite(SINK_PULSE_OUT, HIGH);

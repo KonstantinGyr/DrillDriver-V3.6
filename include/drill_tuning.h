@@ -23,11 +23,12 @@ void drill_tuning(){
             disp.clear();
             disp.print("on O");
             disp.update();
-            Serial.println("on O");
-        for(int i = 0; i < (drillSpinCounter + 100); i++){
+            Serial.println("run to O");
+        for(int i = 0; i < (drillSpinCounter + 200); i++){
           DBR_drill_zero_sens.update();
           if(DBR_drill_zero_sens.read() == LOW){
             drillSpinCounter = 0;
+            Serial.println("on O");
             break;
           }
           if(i/100 == 0)Watchdog.reset();
