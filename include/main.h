@@ -40,15 +40,15 @@ int sinkSpinCounter = 0;
 int run_out = 160;
 int countDown = 0;
 
-Bounce DBR_start = Bounce();
-Bounce DBR_select = Bounce();
-Bounce DBR_drill_zero_sens = Bounce();
-Bounce DBR_sink_zero_sens = Bounce();
-Bounce DBR_mode_button = Bounce();
-Bounce DBR_EE_write = Bounce();
-Bounce DBR_ff_button = Bounce();
-Bounce DBR_rew_button = Bounce();
-Bounce DBR_on_start_pos = Bounce();
+Bounce2::Button DBR_start = Bounce2::Button();
+Bounce2::Button DBR_select = Bounce2::Button();
+Bounce2::Button DBR_drill_zero_sens = Bounce2::Button();
+Bounce2::Button DBR_sink_zero_sens = Bounce2::Button();
+Bounce2::Button DBR_mode_button = Bounce2::Button();
+Bounce2::Button DBR_EE_write = Bounce2::Button();
+Bounce2::Button DBR_ff_button = Bounce2::Button();
+Bounce2::Button DBR_rew_button = Bounce2::Button();
+Bounce2::Button DBR_on_start_pos = Bounce2::Button();
 
 void setup();
 

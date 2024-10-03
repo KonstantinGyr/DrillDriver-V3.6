@@ -14,7 +14,8 @@ int pulse = 20;           //импульс длительность (мкс)
 
  
 void twoStagesServo(int run_spindel,int work_pause, int work_zone ,int pulsePin,int dirPin){
-  Serial .println("Two stages run ." + (dirPin == 15 )? " Drill ":" Sink" );
+  Serial.print("Two stage. "  );
+  Serial.println((dirPin == 15 )? " Drill ":" Sink");
   accel = 200;
   float num = low_freq_pause;
   digitalWrite(dirPin, HIGH);
@@ -43,8 +44,8 @@ void twoStagesServo(int run_spindel,int work_pause, int work_zone ,int pulsePin,
 void oneStageServo(int work_pause, int work_zone,int pulsePin,int dirPin){
   float num = low_freq_pause;
   (960 - work_pause*2)/4 > 0 ? accel = (960 - work_pause*2)/4 : accel = 40;
-  Serial.println("One stage. "+ (dirPin == 15 )? " Drill ":" Sink");
-
+  Serial.print("One stage. "  );
+  Serial.println((dirPin == 15 )? " Drill ":" Sink");
   digitalWrite(dirPin, HIGH);
   delayMks(1);
   //--------------------------------быстрое перемещение
@@ -62,7 +63,7 @@ void oneStageServo(int work_pause, int work_zone,int pulsePin,int dirPin){
 void returnSpindel(int return_spindel,int pulsePin, bool spindel){
   float num = low_freq_pause;
   accel = 200; 
-  Serial.println(spindel);
+  //Serial.println(spindel);
   Serial.println("Return");
   for (int i = 0; i < return_spindel; i++){
     if (i < accel) num -= num / (accel / 10);
@@ -77,6 +78,7 @@ void returnSpindel(int return_spindel,int pulsePin, bool spindel){
     digitalWrite(pulsePin, LOW);
     delayMks((int)num + high_freq_pause);
   }
+  num = 0.1;
   for(int i = 0 ; i < run_out; i++){
     //Serial.println(num);
     num += num/ (run_out/10);
@@ -101,7 +103,8 @@ void RunDrill(){
   if (FF_spindel > 2000)  FF_spindel = 2000;
   run_spindel = FF_spindel - work_zone ;
   if((FF_spindel - work_zone) < 240 +((work_pause - high_freq_pause)/10)){
-     oneStageServo(work_pause,work_zone,DRILL_PULSE_OUT,DRILL_DIR_OUT );
+    
+     oneStageServo(work_pause,FF_spindel,DRILL_PULSE_OUT,DRILL_DIR_OUT );
   }
   else {
      twoStagesServo(run_spindel,work_pause,work_zone,DRILL_PULSE_OUT,DRILL_DIR_OUT );   
@@ -120,11 +123,11 @@ void RunSink(){
   EEPROM.get(SINK_ADDRES, FF_spindel);
   EEPROM.get(SINK_SERVO_SPEED_ADDRES,work_pause);
   EEPROM.get(SINK_WORK_ADDRES,work_zone);
-  Serial.println("SINK : FF-" + String(FF_spindel) + " Speed-" + String(work_pause) + " Work-" + String(work_zone));
+  //Serial.println("SINK : FF-" + String(FF_spindel) + " Speed-" + String(work_pause) + " Work-" + String(work_zone));
   if (FF_spindel > 1200)  FF_spindel = 1200; 
   run_spindel = FF_spindel - work_zone;
   if((FF_spindel - work_zone) < 240 +((work_pause - high_freq_pause)/10)){
-    oneStageServo(work_pause,work_zone,SINK_PULSE_OUT,SINK_DIR_OUT);
+    oneStageServo(work_pause,FF_spindel,SINK_PULSE_OUT,SINK_DIR_OUT);
   }
   else  {
     twoStagesServo(run_spindel,work_pause,work_zone,SINK_PULSE_OUT,SINK_DIR_OUT);

@@ -12,7 +12,7 @@ void sink_tuning(){
       DBR_rew_button.update();
       //-------------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out);
+        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out + 80);
         disp.clear();
         disp.print("gone");
         disp.update();

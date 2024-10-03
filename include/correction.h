@@ -29,6 +29,9 @@ void Correction(bool select){
       disp.print("done");
       disp.update();
       delay(1000);
+      disp.clear();
+      disp.print("-go-");
+      disp.update();
       return;
     }
     Watchdog.reset();
@@ -37,5 +40,8 @@ void Correction(bool select){
   disp.print("end");
   disp.update();
   delay(1000);
+  disp.clear();
+  disp.print("-go-");
+  disp.update();
   return;
 }
