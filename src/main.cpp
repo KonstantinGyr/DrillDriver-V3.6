@@ -10,18 +10,17 @@
 
 void setup(){
   Serial.begin(9600);
-  Serial.println("start");
+  Serial.println("---Start");
   // -------------------------------входы с подтяжкой
-  pinMode(START_PIN, INPUT_PULLUP);
-  pinMode(MODE_PIN, INPUT_PULLUP);
-  pinMode(SELECT_PIN,INPUT_PULLUP);
-  pinMode(DRILL_SENS_PIN, INPUT_PULLUP);
-  pinMode(SINK_SENS_PIN,INPUT_PULLUP);
-  pinMode(REW_RUN_PIN, INPUT_PULLUP);
-  pinMode(FF_RUN_PIN, INPUT_PULLUP);
-  pinMode(INIT_POS_BUTTON_PIN, INPUT_PULLUP);
-  pinMode(WRITE_CORRECT_BUTTON, INPUT_PULLUP);
- // Serial.println("input init");
+  pinMode(START_PIN, INPUT);
+  pinMode(MODE_PIN, INPUT);
+  pinMode(SELECT_PIN,INPUT);
+  pinMode(DRILL_SENS_PIN, INPUT);
+  pinMode(SINK_SENS_PIN,INPUT);
+  pinMode(REW_RUN_PIN, INPUT);
+  pinMode(FF_RUN_PIN, INPUT);
+  pinMode(INIT_POS_BUTTON_PIN, INPUT);
+  pinMode(WRITE_CORRECT_BUTTON, INPUT);
   //---------------------------------выходы
   pinMode(DIO_PIN,OUTPUT);
   pinMode(CLK_PIN,OUTPUT);
@@ -29,28 +28,46 @@ void setup(){
   pinMode(DRILL_DIR_OUT, OUTPUT);
   pinMode(SINK_PULSE_OUT, OUTPUT);
   pinMode(SINK_DIR_OUT, OUTPUT);
-  //Serial.println("output init");
-  //-----------------------------антидребезг
+
+  //-----------антидребезг
+  //-----------------------------старт
   DBR_start.attach(START_PIN);
   DBR_start.interval(3);
+  DBR_start.setPressedState(LOW);
+  //-----------------------------выбор шпинделя
   DBR_select.attach(SELECT_PIN);
   DBR_select.interval(3);
+  DBR_select.setPressedState(LOW);
+  //-----------------------------сверление датчик
   DBR_drill_zero_sens.attach(DRILL_SENS_PIN);
-  DBR_drill_zero_sens.interval(1);
+  DBR_drill_zero_sens.interval(3);
+  DBR_drill_zero_sens.setPressedState(LOW);
+  //-----------------------------зенкование датчик
   DBR_sink_zero_sens.attach(SINK_SENS_PIN);
-  DBR_sink_zero_sens.interval(1);
+  DBR_sink_zero_sens.interval(3);
+  DBR_sink_zero_sens.setPressedState(LOW);
+  //-----------------------------режим
   DBR_mode_button.attach(MODE_PIN);
   DBR_mode_button.interval(3);
+  DBR_mode_button.setPressedState(LOW);
+  //-----------------------------коррекция/запись
   DBR_EE_write.attach(WRITE_CORRECT_BUTTON);
   DBR_EE_write.interval(3);
+  DBR_EE_write.setPressedState(LOW);
+  //-----------------------------вперед
   DBR_ff_button.attach(FF_RUN_PIN);
-  DBR_ff_button.interval(1);
+  DBR_ff_button.interval(3);
+  DBR_ff_button.setPressedState(LOW);
+  //-----------------------------назад
   DBR_rew_button.attach(REW_RUN_PIN);
-  DBR_rew_button.interval(1);
+  DBR_rew_button.interval(3);
+  DBR_rew_button.setPressedState(LOW);
+  //-----------------------------на старт
   DBR_on_start_pos.attach(INIT_POS_BUTTON_PIN);
   DBR_on_start_pos.interval(3);
-  //Serial.println("debounser init");
-  //---------------------дисплей. печатать справа
+  DBR_on_start_pos.setPressedState(LOW);
+
+  //-------дисплей. печатать справа
   disp.printRight(true);  
   disp.setCursorEnd(); 
   Serial.println("display init");
@@ -58,49 +75,62 @@ void setup(){
   pinMode(13, OUTPUT); //---dePin
   modbus.begin(1,9600);
 
-  /*Serial.println("HR" + String(holdingRegisters[0]) + ", " + String(holdingRegisters[1]) + ", "
-                  + String(holdingRegisters[2]) + ", " +String(holdingRegisters[3]) );*/
   EEPROM.get(DRILL_SERVO_SPEED_ADDRES,holdingRegisters[0] );
   EEPROM.get(SINK_SERVO_SPEED_ADDRES,holdingRegisters[1]);
   EEPROM.get(DRILL_WORK_ADDRES,holdingRegisters[2]);
   EEPROM.get(SINK_WORK_ADDRES, holdingRegisters[3]);
   readModbusRegisters();
-  /*Serial.println("HR" + String(holdingRegisters[0]) + ", " + String(holdingRegisters[1]) + ", "
-                  + String(holdingRegisters[2]) + ", " +String(holdingRegisters[3]) );*/
+  
   Watchdog.enable(RESET_MODE, WDT_PRESCALER_256); // Режим сторжевого сброса , таймаут ~2с  
 }
 
 
 void loop(){
-  DBR_drill_zero_sens.update();
-  DBR_sink_zero_sens.update();
-  DBR_start.update();
+  //DBR_drill_zero_sens.update();
+  //DBR_sink_zero_sens.update();
+  //DBR_start.update();
   DBR_mode_button.update();
-  DBR_EE_write.update();
-  DBR_select.update();
+  //DBR_EE_write.update();
+  //DBR_select.update();
   //-----------------------------------режим "Работа"
-  if (DBR_mode_button.read() == LOW){ 
-    disp.clear();
-    disp.print("-go-");
-    disp.update();
-    Serial.println("Poll start");
-    //readModbusRegisters();
-  //-----------------------------------Один рабочий цикл
-    if (DBR_drill_zero_sens.read() == LOW && DBR_sink_zero_sens.read() == LOW && DBR_start.fell()){
-      RunDrill();
-      Watchdog.reset();
-      DBR_drill_zero_sens.update();
-      if(DBR_drill_zero_sens.read() == LOW ){
-         RunSink();
-      }
+  if (DBR_mode_button.isPressed()){ 
+    DBR_drill_zero_sens.update();
+    DBR_sink_zero_sens.update();
+    if(!DBR_drill_zero_sens.isPressed() || !DBR_sink_zero_sens.isPressed()){
+      Serial.println("not start position");
+      disp.clear();
+      disp.print("no 0");
+      disp.update();
     }
-    //---------------------------------коррекция выбега 
-    else if(DBR_EE_write.fell() ){
-      Correction(DBR_select.read());
+    else{
+      Serial.println(" machine ready");
+      disp.clear();
+      disp.print("-go-");
+      disp.update();
+    }
+    while(DBR_mode_button.isPressed()){
+      DBR_start.update();
+      DBR_EE_write.update();
+      if(DBR_start.pressed()){
+        DBR_drill_zero_sens.update();
+        DBR_sink_zero_sens.update();
+        if(DBR_drill_zero_sens.isPressed() && DBR_sink_zero_sens.isPressed()){
+          RunDrill();//-----------------------------------Один рабочий цикл
+          Watchdog.reset();
+          DBR_drill_zero_sens.update();
+          if(DBR_drill_zero_sens.pressed() ) RunSink();
+        }
+      }
+      else if(DBR_EE_write.pressed() ){//--------------коррекция выбега
+        DBR_select.update();
+        Correction(DBR_select.read());
+      }
+      DBR_mode_button.update();
+      Watchdog.reset();
     }
   }
   //-----------------------------------режим "Наладка"
-  else if ( DBR_mode_button.read() == HIGH ){
+  else {
   //-----------------------------------верхний шпиндель 
     while(DBR_select.read() == DRILL){  
       DBR_mode_button.update();
