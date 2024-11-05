@@ -14,7 +14,7 @@ void Correction(bool select){
     DBR_ff_button.update();
     DBR_rew_button.update();
     DBR_EE_write.update();
-    //коррекция "+""-"" : одно нажатие - 8 шагов(0,1мм)
+  //-------коррекция "+""-"" : одно нажатие - 8 шагов(0,1мм)
     if(DBR_ff_button.fell()){
       value -= 8;
       i = 0;

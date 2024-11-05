@@ -12,7 +12,7 @@ void drill_tuning(){
       DBR_rew_button.update();
       //------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out + 80);
+        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out );
         disp.clear();
         disp.print("gone");
         disp.update();
@@ -45,9 +45,9 @@ void drill_tuning(){
           delay(1);
         }             
       }
-      //------------------------------- кнопка вперед
+      //------------------------------- кнопка назад
       else if (DBR_ff_button.read() == LOW) {
-        Serial.println("drill forward");
+        Serial.println("drill revers");
         while (DBR_ff_button.read() == LOW){
           disp.clear();
           disp.print(drillSpinCounter);
@@ -62,9 +62,9 @@ void drill_tuning(){
           Watchdog.reset();
         }
       }
-      //-----------------------------кнопка назад
+      //-----------------------------кнопка вперед
       else if (DBR_rew_button.read() == LOW){
-        Serial.println("drill revese");
+        Serial.println("drill forward");
         while (DBR_rew_button.read() == LOW){
           disp.clear();
           disp.print(drillSpinCounter);

@@ -7,6 +7,7 @@
 
 #include <GyverSegment.h>
 #define DISP1637_CLK_DELAY 100
+int counter;
 
 void setup(){
   Serial.begin(9600);
@@ -71,6 +72,7 @@ void setup(){
   disp.printRight(true);  
   disp.setCursorEnd(); 
   Serial.println("display init");
+  counter = 0;
   modbus.configureHoldingRegisters(holdingRegisters, 4); 
   pinMode(13, OUTPUT); //---dePin
   modbus.begin(1,9600);
@@ -79,19 +81,17 @@ void setup(){
   EEPROM.get(SINK_SERVO_SPEED_ADDRES,holdingRegisters[1]);
   EEPROM.get(DRILL_WORK_ADDRES,holdingRegisters[2]);
   EEPROM.get(SINK_WORK_ADDRES, holdingRegisters[3]);
+  delay(5000);
   readModbusRegisters();
   
-  Watchdog.enable(RESET_MODE, WDT_PRESCALER_256); // Режим сторжевого сброса , таймаут ~2с  
+  Watchdog.enable(RESET_MODE, WDT_PRESCALER_256); // Режим сторжевого сброса , таймаут ~2с
+  DBR_drill_zero_sens.update();
+  DBR_sink_zero_sens.update();  
 }
 
 
 void loop(){
-  //DBR_drill_zero_sens.update();
-  //DBR_sink_zero_sens.update();
-  //DBR_start.update();
   DBR_mode_button.update();
-  //DBR_EE_write.update();
-  //DBR_select.update();
   //-----------------------------------режим "Работа"
   if (DBR_mode_button.isPressed()){ 
     DBR_drill_zero_sens.update();
@@ -111,18 +111,24 @@ void loop(){
     while(DBR_mode_button.isPressed()){
       DBR_start.update();
       DBR_EE_write.update();
+      DBR_select.update();
       if(DBR_start.pressed()){
+        counter++ ;
+        Serial.println("START");
+        Serial.println("counter : " + String(counter));
         DBR_drill_zero_sens.update();
         DBR_sink_zero_sens.update();
         if(DBR_drill_zero_sens.isPressed() && DBR_sink_zero_sens.isPressed()){
           RunDrill();//-----------------------------------Один рабочий цикл
           Watchdog.reset();
           DBR_drill_zero_sens.update();
-          if(DBR_drill_zero_sens.pressed() ) RunSink();
+          if(DBR_drill_zero_sens.isPressed() ) RunSink();
+          Watchdog.reset();
         }
       }
-      else if(DBR_EE_write.pressed() ){//--------------коррекция выбега
-        DBR_select.update();
+      else if(DBR_EE_write.fell() ){//--------------коррекция выбега
+        
+        Serial.println("spindel : " + String(DBR_select.read()));
         Correction(DBR_select.read());
       }
       DBR_mode_button.update();
@@ -130,7 +136,7 @@ void loop(){
     }
   }
   //-----------------------------------режим "Наладка"
-  else {
+  else if(DBR_mode_button.read() == HIGH) {
   //-----------------------------------верхний шпиндель 
     while(DBR_select.read() == DRILL){  
       DBR_mode_button.update();

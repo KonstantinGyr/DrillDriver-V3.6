@@ -37,7 +37,7 @@ Disp1637Colon disp(DIO_PIN, CLK_PIN);
 
 int drillSpinCounter = 0;
 int sinkSpinCounter = 0;
-int run_out = 160;
+int run_out = 160; // наезд на датчик
 int countDown = 0;
 
 Bounce2::Button DBR_start = Bounce2::Button();

@@ -12,7 +12,7 @@ void sink_tuning(){
       DBR_rew_button.update();
       //-------------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out + 80);
+        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out);
         disp.clear();
         disp.print("gone");
         disp.update();
@@ -44,9 +44,9 @@ void sink_tuning(){
           delay(1);
         }
       }
-      //-------------------------------кнопка вперед
+      //-------------------------------кнопка назад
       else if (DBR_ff_button.read() == LOW){ 
-        Serial.println("sink forward");
+        Serial.println("sink revers");
         while (DBR_ff_button.read() == LOW){
           disp.clear();
           disp.print(sinkSpinCounter);
@@ -60,9 +60,9 @@ void sink_tuning(){
           Watchdog.reset();
         }
       }
-      //---------------------------------кнопка назад
+      //---------------------------------кнопка вперед
       else if (DBR_rew_button.read() == LOW){ 
-        Serial.println("sink rewers");
+        Serial.println("sink forward");
         while (DBR_rew_button.read() == LOW){
           disp.clear();
           disp.print(sinkSpinCounter);
