@@ -12,7 +12,7 @@ void sink_tuning(){
       DBR_rew_button.update();
       //-------------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out);
+        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out + 130);
         disp.clear();
         disp.print("gone");
         disp.update();
@@ -24,7 +24,7 @@ void sink_tuning(){
             disp.print("on O");
             disp.update();
             Serial.println("sink go to O");
-        for(int i = 0; i < (sinkSpinCounter + 200); i++){
+        for(int i = 0; i < (sinkSpinCounter + run_out + 130); i++){
           DBR_sink_zero_sens.update();
           if(DBR_sink_zero_sens.read() == LOW){
             sinkSpinCounter = 0;

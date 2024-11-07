@@ -12,7 +12,7 @@ void drill_tuning(){
       DBR_rew_button.update();
       //------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out );
+        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out + 80 );
         disp.clear();
         disp.print("gone");
         disp.update();
@@ -24,7 +24,7 @@ void drill_tuning(){
             disp.print("on O");
             disp.update();
             Serial.println("run to O");
-        for(int i = 0; i < (drillSpinCounter + 200); i++){
+        for(int i = 0; i < (drillSpinCounter + run_out + 80 ); i++){
           DBR_drill_zero_sens.update();
           if(DBR_drill_zero_sens.read() == LOW){
             drillSpinCounter = 0;
