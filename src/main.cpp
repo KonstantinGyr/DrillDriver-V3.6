@@ -73,7 +73,7 @@ void setup(){
   disp.setCursorEnd(); 
   Serial.println("display init");
   counter = 0;
-  modbus.configureHoldingRegisters(holdingRegisters, 4); 
+  modbus.configureHoldingRegisters(holdingRegisters, 6); 
   pinMode(13, OUTPUT); //---dePin
   modbus.begin(1,9600);
 
@@ -81,6 +81,8 @@ void setup(){
   EEPROM.get(SINK_SERVO_SPEED_ADDRES,holdingRegisters[1]);
   EEPROM.get(DRILL_WORK_ADDRES,holdingRegisters[2]);
   EEPROM.get(SINK_WORK_ADDRES, holdingRegisters[3]);
+  EEPROM.get(DRILL_EDIT_ADDRES,holdingRegisters[4]);
+  EEPROM.get(SINK_EDIT_ADDRES,holdingRegisters[5]);
   delay(5000);
   readModbusRegisters();
   
