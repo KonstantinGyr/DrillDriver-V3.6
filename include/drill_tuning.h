@@ -1,6 +1,8 @@
 #pragma once
 #include "main.h"
 
+int editDrill;
+
 void drill_tuning(){
       disp.clear();
       disp.print(drillSpinCounter);
@@ -10,9 +12,10 @@ void drill_tuning(){
       DBR_on_start_pos.update();
       DBR_ff_button.update();
       DBR_rew_button.update();
+      EEPROM.get(DRILL_EDIT_ADDRES,editDrill);
       //------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out + 80 );
+        EEPROM.put(DRILL_ADDRES,drillSpinCounter + run_out + editDrill );
         disp.clear();
         disp.print("gone");
         disp.update();

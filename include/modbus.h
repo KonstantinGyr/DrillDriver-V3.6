@@ -3,7 +3,7 @@
 #include "ModbusRTUSlave.h"
 
 const uint8_t dePin = 13;
-uint16_t holdingRegisters[4];
+uint16_t holdingRegisters[6];
 ModbusRTUSlave modbus(Serial,dePin);
 
 void readModbusRegisters(){
@@ -14,5 +14,7 @@ void readModbusRegisters(){
     EEPROM.put(SINK_SERVO_SPEED_ADDRES,holdingRegisters[1]);
     EEPROM.put(DRILL_WORK_ADDRES,holdingRegisters[2]);
     EEPROM.put(SINK_WORK_ADDRES,holdingRegisters[3]);
+    EEPROM.put(DRILL_EDIT_ADDRES,holdingRegisters[4]);
+    EEPROM.put(SINK_EDIT_ADDRES,holdingRegisters[5]);
     
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "main.h"
 
+int editSink;
+
 void sink_tuning(){  
       disp.clear();
       disp.print(sinkSpinCounter);
@@ -10,9 +12,10 @@ void sink_tuning(){
       DBR_on_start_pos.update();
       DBR_ff_button.update();
       DBR_rew_button.update();
+      EEPROM.get(SINK_EDIT_ADDRES,editSink);
       //-------------------------------запись значения выбега
       if (DBR_EE_write.fell()) {
-        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out + 130);
+        EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out + editSink);
         disp.clear();
         disp.print("gone");
         disp.update();

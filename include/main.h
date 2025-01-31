@@ -22,7 +22,9 @@
 #define DRILL_SERVO_SPEED_ADDRES 8
 #define SINK_SERVO_SPEED_ADDRES 12
 #define DRILL_WORK_ADDRES 16
-#define SINK_WORK_ADDRES 20
+#define SINK_WORK_ADDRES 20 
+#define DRILL_EDIT_ADDRES 24
+#define SINK_EDIT_ADDRES 28
 //----------------дисплей
 #define DIO_PIN 11
 #define CLK_PIN 12
