@@ -17,6 +17,8 @@
 #define WRITE_CORRECT_BUTTON 10
 #define DRILL LOW
 #define SINK HIGH
+#define WORK LOW
+#define AJASTMENT HIGH
 #define DRILL_ADDRES 0
 #define SINK_ADDRES 4
 #define DRILL_SERVO_SPEED_ADDRES 8
@@ -39,7 +41,7 @@ Disp1637Colon disp(DIO_PIN, CLK_PIN);
 
 int drillSpinCounter = 0;
 int sinkSpinCounter = 0;
-int run_out = 160; // наезд на датчик
+int run_out = 100; // наезд на датчик
 int countDown = 0;
 
 Bounce2::Button DBR_start = Bounce2::Button();

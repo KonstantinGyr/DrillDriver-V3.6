@@ -63,16 +63,13 @@ void oneStageServo(int work_pause, int work_zone,int pulsePin,int dirPin){
 void returnSpindel(int return_spindel,int pulsePin, bool spindel){
   float num = low_freq_pause;
   accel = 200; 
-  //Serial.println(spindel);
   Serial.println("Return");
   for (int i = 0; i < return_spindel; i++){
     if (i < accel) num -= num / (accel / 10);
     //-------------------------------------------------------------завершение по датчику
      DBR_sink_zero_sens.update() ;
      DBR_drill_zero_sens.update();
-    //Serial.println(" sens dril: " + String(digitalRead(DRILL_SENS_PIN)) + ", sink:  " + String(digitalRead(SINK_SENS_PIN)));
     if (spindel?  DBR_sink_zero_sens.fell(): DBR_drill_zero_sens.fell())break; 
-    //Serial.println(num );
     digitalWrite(pulsePin, HIGH);
     delayMks(pulse);
     digitalWrite(pulsePin, LOW);
@@ -80,9 +77,7 @@ void returnSpindel(int return_spindel,int pulsePin, bool spindel){
   }
   num = 0.1;
   for(int i = 0 ; i < run_out; i++){
-    //Serial.println(num);
     num += num/ (run_out/10);
-    //Serial.println(num);
     digitalWrite(pulsePin, HIGH);
     delayMks(pulse);
     digitalWrite(pulsePin, LOW);
@@ -91,15 +86,10 @@ void returnSpindel(int return_spindel,int pulsePin, bool spindel){
 }
 
 void RunDrill(){
- /* disp.clear();
-  disp.print(" run");
-  disp.update();*/
-  
   //------считывание из памяти значений подачи и выбега
   EEPROM.get(DRILL_ADDRES, FF_spindel);
   EEPROM.get(DRILL_SERVO_SPEED_ADDRES,work_pause);
   EEPROM.get(DRILL_WORK_ADDRES,work_zone);
-  //Serial.println("Top : FF-" + String(FF_spindel) + " Speed-" + String(work_pause) + " Work-" + String(work_zone));
   if (FF_spindel > 2000)  FF_spindel = 2000;
   run_spindel = FF_spindel - work_zone ;
   if((FF_spindel - work_zone) < 240 +((work_pause - high_freq_pause)/10)){
@@ -110,20 +100,16 @@ void RunDrill(){
      twoStagesServo(run_spindel,work_pause,work_zone,DRILL_PULSE_OUT,DRILL_DIR_OUT );   
   }
   return_spindel = FF_spindel + 400 ; // один оборот в плюс
-  DBR_sink_zero_sens.update() ;
-  DBR_drill_zero_sens.update();
- // Serial.println(" sens dril: " + String(digitalRead(DRILL_SENS_PIN)) + ", sink:  " + String(digitalRead(SINK_SENS_PIN))); 
+  //DBR_drill_zero_sens.update();
+  if(digitalRead(DRILL_SENS_PIN) ){
   returnSpindel(return_spindel,DRILL_PULSE_OUT,DRILL);
+  }
 }
 void RunSink(){
- /* disp.clear();
-  disp.print("sink");
-  disp.update();*/
   //------------считывание из памяти значений подачи и выбега
   EEPROM.get(SINK_ADDRES, FF_spindel);
   EEPROM.get(SINK_SERVO_SPEED_ADDRES,work_pause);
   EEPROM.get(SINK_WORK_ADDRES,work_zone);
-  //Serial.println("SINK : FF-" + String(FF_spindel) + " Speed-" + String(work_pause) + " Work-" + String(work_zone));
   if (FF_spindel > 1200)  FF_spindel = 1200; 
   run_spindel = FF_spindel - work_zone;
   if((FF_spindel - work_zone) < 240 +((work_pause - high_freq_pause)/10)){
@@ -132,6 +118,9 @@ void RunSink(){
   else  {
     twoStagesServo(run_spindel,work_pause,work_zone,SINK_PULSE_OUT,SINK_DIR_OUT);
   }
-  return_spindel = FF_spindel + 50 ;
-  returnSpindel(return_spindel,SINK_PULSE_OUT,SINK);
+  return_spindel = FF_spindel + 400 ;      // один оборот в плюс
+  DBR_drill_zero_sens.update();
+  if(digitalRead(SINK_SENS_PIN) ){
+    returnSpindel(return_spindel,SINK_PULSE_OUT,SINK);
+  }
 }

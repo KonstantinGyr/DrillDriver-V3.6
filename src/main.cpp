@@ -41,11 +41,11 @@ void setup(){
   DBR_select.setPressedState(LOW);
   //-----------------------------сверление датчик
   DBR_drill_zero_sens.attach(DRILL_SENS_PIN);
-  DBR_drill_zero_sens.interval(3);
+  DBR_drill_zero_sens.interval(1);
   DBR_drill_zero_sens.setPressedState(LOW);
   //-----------------------------зенкование датчик
   DBR_sink_zero_sens.attach(SINK_SENS_PIN);
-  DBR_sink_zero_sens.interval(3);
+  DBR_sink_zero_sens.interval(1);
   DBR_sink_zero_sens.setPressedState(LOW);
   //-----------------------------режим
   DBR_mode_button.attach(MODE_PIN);
@@ -87,15 +87,14 @@ void setup(){
   readModbusRegisters();
   
   Watchdog.enable(RESET_MODE, WDT_PRESCALER_256); // Режим сторжевого сброса , таймаут ~2с
-  DBR_drill_zero_sens.update();
-  DBR_sink_zero_sens.update();  
+  //DBR_drill_zero_sens.update();
+  //DBR_sink_zero_sens.update();  
 }
-
 
 void loop(){
   DBR_mode_button.update();
   //-----------------------------------режим "Работа"
-  if (DBR_mode_button.isPressed()){ 
+  if (DBR_mode_button.read() == WORK){ 
     DBR_drill_zero_sens.update();
     DBR_sink_zero_sens.update();
     if(!DBR_drill_zero_sens.isPressed() || !DBR_sink_zero_sens.isPressed()){
@@ -105,55 +104,64 @@ void loop(){
       disp.update();
     }
     else{
-      Serial.println(" machine ready");
+      Serial.println("machine ready");
       disp.clear();
       disp.print("-go-");
       disp.update();
-    }
-    while(DBR_mode_button.isPressed()){
-      DBR_start.update();
-      DBR_EE_write.update();
-      DBR_select.update();
-      if(DBR_start.pressed()){
-        counter++ ;
-        Serial.println("START");
-        Serial.println("counter : " + String(counter));
-        DBR_drill_zero_sens.update();
-        DBR_sink_zero_sens.update();
-        if(DBR_drill_zero_sens.isPressed() && DBR_sink_zero_sens.isPressed()){
-          RunDrill();//-----------------------------------Один рабочий цикл
-          Watchdog.reset();
+      while(DBR_mode_button.read() == WORK){
+        readModbusRegisters();
+        DBR_start.update();
+        DBR_EE_write.update();
+        if(DBR_start.pressed()){
+          counter++ ;
+          Serial.println("START");
+          Serial.println("counter : " + String(counter));
           DBR_drill_zero_sens.update();
-          if(DBR_drill_zero_sens.isPressed() ) RunSink();
-          Watchdog.reset();
+          DBR_sink_zero_sens.update();
+          if(DBR_drill_zero_sens.isPressed() && DBR_sink_zero_sens.isPressed()){
+            RunDrill();//-----------------------------------Один рабочий цикл
+
+            Watchdog.reset();
+            //delay(20);
+           // DBR_drill_zero_sens.update();
+            if(!digitalRead(DRILL_SENS_PIN)){
+              RunSink();
+            }
+            Watchdog.reset();
+          }
+          else {
+            disp.clear();
+            disp.print("no 0");
+            disp.update();
+          }
         }
+        else if(DBR_EE_write.pressed() ){//--------------коррекция выбега
+          DBR_select.update();
+          Serial.println("spindel : " + String(DBR_select.read()));
+          Correction(DBR_select.read());
+        }
+        DBR_mode_button.update();
+        Watchdog.reset();
       }
-      else if(DBR_EE_write.fell() ){//--------------коррекция выбега
-        
-        Serial.println("spindel : " + String(DBR_select.read()));
-        Correction(DBR_select.read());
-      }
-      DBR_mode_button.update();
-      Watchdog.reset();
-    }
+    }  
   }
   //-----------------------------------режим "Наладка"
-  else if(DBR_mode_button.read() == HIGH) {
+  else  {
   //-----------------------------------верхний шпиндель 
     while(DBR_select.read() == DRILL){  
       DBR_mode_button.update();
+      if (DBR_mode_button.read() == LOW)break;
       //-----------------------------------опрос MODBUS
       readModbusRegisters();
-      if (DBR_mode_button.read() == LOW)break;
       drill_tuning();
       Watchdog.reset();
     }
     //---------------------------------нижний шпиндель
     while(DBR_select.read() == SINK){ 
-      //-----------------------------------опрос MODBUS
-      readModbusRegisters(); //
       DBR_mode_button.update();
       if (DBR_mode_button.read() == LOW)break;
+      //-----------------------------------опрос MODBUS
+      readModbusRegisters(); //
       sink_tuning();
       Watchdog.reset();
     }

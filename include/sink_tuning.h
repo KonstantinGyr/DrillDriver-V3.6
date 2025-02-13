@@ -25,9 +25,10 @@ void sink_tuning(){
       if (DBR_on_start_pos.fell() && DBR_sink_zero_sens.read() == HIGH ){  
             disp.clear();
             disp.print("on O");
+            EEPROM.put(SINK_ADDRES,sinkSpinCounter + run_out + editSink);
             disp.update();
             Serial.println("sink go to O");
-        for(int i = 0; i < (sinkSpinCounter + run_out + 130); i++){
+        for(int i = 0; i < (sinkSpinCounter + run_out + editSink + 40); i++){
           DBR_sink_zero_sens.update();
           if(DBR_sink_zero_sens.read() == LOW){
             sinkSpinCounter = 0;
@@ -66,7 +67,7 @@ void sink_tuning(){
       //---------------------------------кнопка вперед
       else if (DBR_rew_button.read() == LOW){ 
         Serial.println("sink forward");
-        while (DBR_rew_button.read() == LOW){
+        while (DBR_rew_button.read() == LOW && sinkSpinCounter < 1000){
           disp.clear();
           disp.print(sinkSpinCounter);
           disp.update();
